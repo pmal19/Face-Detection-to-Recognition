@@ -103,7 +103,7 @@ def main():
     momentum = 0.9
 
     numWorkers = 5
-    numEpochs = 10
+    numEpochs = 1
 
     numberOfClasses = 10
 

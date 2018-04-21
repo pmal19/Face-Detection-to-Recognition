@@ -49,8 +49,15 @@ class recog(nn.Module):
         self.conv7_1 = nn.Conv2d(512, 128, kernel_size=1, stride=1, padding=0)
         self.conv7_2 = nn.Conv2d(128, 256, kernel_size=3, stride=2, padding=1)
 
-        self.features = nn.Linear(256*2*2, 32)
-        self.classifier = nn.Linear(32, numberOfClasses)
+        self.biLin1 = nn.Bilinear(256*16*16, 512*8*8, 128)
+        self.biLin2 = nn.Bilinear(512*4*4, 1024*6*6, 128)
+        self.biLin3 = nn.Bilinear(512*3*3, 256*2*2, 32)
+
+        self.biLin4 = nn.Bilinear(128, 128, 32)
+        self.biLin5 = nn.Bilinear(32, 32, 16)
+
+        self.features = nn.Linear(16, 10)
+        self.classifier = nn.Linear(10, numberOfClasses)
 
         # self.conv3_3_norm = L2Norm(256,scale=10)
         # self.conv4_3_norm = L2Norm(512,scale=8)
@@ -102,11 +109,40 @@ class recog(nn.Module):
         h = F.relu(self.conv7_1(h))
         h = F.relu(self.conv7_2(h)); f7_2 = h
 
-        # print(h.size())
-        h = h.view(-1, 256*2*2)
+        print(f3_3.size())
+        print(f4_3.size())
+        print(f5_3.size())
+        print(ffc7.size())
+        print(f6_2.size())
+        print(f7_2.size())
 
-        h = F.relu(self.features(h))
+        f3_3 = f3_3.view(-1, 256*16*16)
+        f4_3 = f4_3.view(-1, 512*8*8)
+        f5_3 = f5_3.view(-1, 512*4*4)
+        ffc7 = ffc7.view(-1, 1024*6*6)
+        f6_2 = f6_2.view(-1, 512*3*3)
+        f7_2 = f7_2.view(-1, 256*2*2)
+
+        h1 = F.relu(self.biLin1(f3_3, f4_3))
+        h2 = F.relu(self.biLin2(f5_3, ffc7))
+        h3 = F.relu(self.biLin3(f6_2, f7_2))
+
+        h4 = F.relu(self.biLin4(h1, h2))
+        h5 = F.relu(self.biLin5(h4, h3))
+
+        h = F.relu(self.features(h5))
         h = F.log_softmax(self.classifier(h), 1)
+
+        # h = h.view(-1, 256*2*2)
+
+        # h = F.relu(self.features(h))
+        # h = F.log_softmax(self.classifier(h), 1)
+
+
+
+
+
+
 
         # f3_3 = self.conv3_3_norm(f3_3)
         # f4_3 = self.conv4_3_norm(f4_3)
@@ -166,9 +202,25 @@ class recog(nn.Module):
         h = F.relu(self.conv7_1(h))
         h = F.relu(self.conv7_2(h)); f7_2 = h
 
-        h = h.view(-1, 256*2*2)
+        f3_3 = f3_3.view(-1, 256*16*16)
+        f4_3 = f4_3.view(-1, 512*8*8)
+        f5_3 = f5_3.view(-1, 512*4*4)
+        ffc7 = ffc7.view(-1, 1024*6*6)
+        f6_2 = f6_2.view(-1, 512*3*3)
+        f7_2 = f7_2.view(-1, 256*2*2)
 
-        encoding = self.features(h)
+        h1 = F.relu(self.biLin1(f3_3, f4_3))
+        h2 = F.relu(self.biLin2(f5_3, ffc7))
+        h3 = F.relu(self.biLin3(f6_2, f7_2))
+
+        h4 = F.relu(self.biLin4(h1, h2))
+        h5 = F.relu(self.biLin5(h4, h3))
+
+        encoding = self.features(h5)
+
+        # h = h.view(-1, 256*2*2)
+
+        # encoding = self.features(h)
 
         return encoding
 
