@@ -167,8 +167,8 @@ class recog(nn.Module):
         h = F.relu(self.conv7_2(h)); f7_2 = h
 
         h = h.view(-1, 256*2*2)
-        
-        encoding = F.relu(self.features(h))
+
+        encoding = self.features(h)
 
         return encoding
 
