@@ -87,7 +87,7 @@ def trainEpoch(epoch, break_val, trainLoader, model, optimizer, criterion, use_c
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(trainLoader.dataset),
                 100. * batch_idx / len(trainLoader), loss.data[0]))
-            save(model, optimizer, loss, 'faceRecog')
+            save(model, optimizer, loss, 'faceRecog.saved.model')
         print(batch_idx,loss.data[0])    	
 
 def train(numEpochs, trainLoader, model, optimizer, criterion, use_cuda):
@@ -103,7 +103,7 @@ def main():
     momentum = 0.9
 
     numWorkers = 5
-    numEpochs = 1
+    numEpochs = 10
 
     numberOfClasses = 10
 
