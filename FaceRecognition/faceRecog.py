@@ -110,6 +110,7 @@ def main():
     modelPath = '../SFD_pytorch/s3fd_convert.pth'
 
     use_cuda = torch.cuda.is_available()
+    print("Using GPU - ",use_cuda)
 
     net = loadNet(numberOfClasses, modelPath)
     if(use_cuda):
